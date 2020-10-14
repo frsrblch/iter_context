@@ -1,5 +1,4 @@
 use super::*;
-use crate::tuple::{IntoIter, Tuple};
 
 pub struct Zip<A, T, U> {
     t: T,
@@ -22,11 +21,11 @@ where
     T: IterOver<Type = A>,
     U: IterOver<Type = A>,
 {
-    type Item = Tuple<T::Item, U::Item>;
-    type IntoIter = IntoIter<T::IntoIter, U::IntoIter>;
+    type Item = (T::Item, U::Item);
+    type IntoIter = std::iter::Zip<T::IntoIter, U::IntoIter>;
 
     fn into_iter(self) -> Self::IntoIter {
-        Tuple(self.t, self.u).into_iter()
+        self.t.into_iter().zip(self.u.into_iter())
     }
 }
 
