@@ -1,6 +1,5 @@
 pub use crate::iter::{Iter, IterMut};
 pub use crate::zip::Zip;
-use std::marker::PhantomData;
 
 mod iter;
 mod zip;

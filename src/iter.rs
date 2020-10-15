@@ -1,4 +1,5 @@
 use super::*;
+use std::marker::PhantomData;
 
 pub struct Iter<'a, A, T> {
     iter: std::slice::Iter<'a, T>,

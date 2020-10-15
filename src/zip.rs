@@ -1,4 +1,5 @@
 use super::*;
+use std::marker::PhantomData;
 
 pub struct Zip<A, T, U> {
     t: T,
