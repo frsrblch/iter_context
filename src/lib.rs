@@ -31,6 +31,8 @@ mod tests {
             .for_each(|(a, b)| {
                 *a += *b;
             });
+
+        assert_eq!(a, [3, 5, 8]);
     }
 
     // #[test]
