@@ -4,13 +4,28 @@ pub use crate::zip::Zip;
 mod iter;
 mod zip;
 
-pub trait IterOver: IntoIterator + Sized {
-    type Type;
+/// An iterator for use with a Struct-of-Arrays data layout, where data is associated by index
+/// within the arrays of the struct.
+///
+/// Types implementing `TypedIterator` with the same `Context` should all be of the same length and
+/// aligned by index, like columns in a table. Types implementing `TypedIterator` should not implement
+/// `Iterator` because many of the `Iterator` functions can cause data misalignment.
+///
+/// Use `IntoIterator::into_iter()` method or `TypedIterator`'s [`for_each`] method after all
+/// desired data has been zipped together.
+///
+/// [`for_each`]: trait.TypedIterator.html#method.for_each
+pub trait TypedIterator: IntoIterator + Sized {
+    /// A `TypedIterator` can only be zipped to another `TypedIterator` with the same `Context`.
+    type Context;
 
-    fn zip<U: IterOver<Type = Self::Type>>(self, rhs: U) -> Zip<Self::Type, Self, U> {
+    /// Zip together two `TypedIterator` with the same Context to return a single `TypedIterator`
+    /// with that same Context.
+    fn zip<U: TypedIterator<Context = Self::Context>>(self, rhs: U) -> Zip<Self::Context, Self, U> {
         Zip::new(self, rhs)
     }
 
+    /// Consume the `TypedIterator` and call the closure on each element.
     fn for_each<F: FnMut(Self::Item)>(self, f: F) {
         self.into_iter().for_each(f);
     }

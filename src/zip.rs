@@ -19,8 +19,8 @@ impl<A, T, U> Zip<A, T, U> {
 
 impl<A, T, U> IntoIterator for Zip<A, T, U>
 where
-    T: IterOver<Type = A>,
-    U: IterOver<Type = A>,
+    T: TypedIterator<Context = A>,
+    U: TypedIterator<Context = A>,
 {
     type Item = (T::Item, U::Item);
     type IntoIter = std::iter::Zip<T::IntoIter, U::IntoIter>;
@@ -30,6 +30,8 @@ where
     }
 }
 
-impl<A, T: IterOver<Type = A>, U: IterOver<Type = A>> IterOver for Zip<A, T, U> {
-    type Type = A;
+impl<A, T: TypedIterator<Context = A>, U: TypedIterator<Context = A>> TypedIterator
+    for Zip<A, T, U>
+{
+    type Context = A;
 }

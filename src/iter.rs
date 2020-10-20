@@ -1,12 +1,12 @@
 use super::*;
 use std::marker::PhantomData;
 
-pub struct Iter<'a, A, T> {
+pub struct Iter<'a, C, T> {
     iter: std::slice::Iter<'a, T>,
-    marker: PhantomData<A>,
+    marker: PhantomData<C>,
 }
 
-impl<'a, A, T> Iter<'a, A, T> {
+impl<'a, C, T> Iter<'a, C, T> {
     pub fn new(iter: std::slice::Iter<'a, T>) -> Self {
         Self {
             iter,
@@ -15,7 +15,7 @@ impl<'a, A, T> Iter<'a, A, T> {
     }
 }
 
-impl<'a, A, T> IntoIterator for Iter<'a, A, T> {
+impl<'a, C, T> IntoIterator for Iter<'a, C, T> {
     type Item = &'a T;
     type IntoIter = std::slice::Iter<'a, T>;
 
@@ -24,16 +24,16 @@ impl<'a, A, T> IntoIterator for Iter<'a, A, T> {
     }
 }
 
-impl<A, T> IterOver for Iter<'_, A, T> {
-    type Type = A;
+impl<C, T> TypedIterator for Iter<'_, C, T> {
+    type Context = C;
 }
 
-pub struct IterMut<'a, A, T> {
+pub struct IterMut<'a, C, T> {
     iter_mut: std::slice::IterMut<'a, T>,
-    marker: PhantomData<A>,
+    marker: PhantomData<C>,
 }
 
-impl<'a, A, T> IterMut<'a, A, T> {
+impl<'a, C, T> IterMut<'a, C, T> {
     pub fn new(iter_mut: std::slice::IterMut<'a, T>) -> Self {
         Self {
             iter_mut,
@@ -42,7 +42,7 @@ impl<'a, A, T> IterMut<'a, A, T> {
     }
 }
 
-impl<'a, A, T> IntoIterator for IterMut<'a, A, T> {
+impl<'a, C, T> IntoIterator for IterMut<'a, C, T> {
     type Item = &'a mut T;
     type IntoIter = std::slice::IterMut<'a, T>;
 
@@ -51,6 +51,6 @@ impl<'a, A, T> IntoIterator for IterMut<'a, A, T> {
     }
 }
 
-impl<A, T> IterOver for IterMut<'_, A, T> {
-    type Type = A;
+impl<C, T> TypedIterator for IterMut<'_, C, T> {
+    type Context = C;
 }
