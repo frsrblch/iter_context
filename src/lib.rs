@@ -1,7 +1,9 @@
 pub use crate::iter::{Iter, IterMut};
+use crate::map::Map;
 pub use crate::zip::Zip;
 
 mod iter;
+mod map;
 mod zip;
 
 /// An iterator for use with a Struct-of-Arrays data layout, where data is associated by index
@@ -23,6 +25,12 @@ pub trait TypedIterator: IntoIterator + Sized {
     /// with that same Context.
     fn zip<U: TypedIterator<Context = Self::Context>>(self, rhs: U) -> Zip<Self::Context, Self, U> {
         Zip::new(self, rhs)
+    }
+
+    /// Map the values from a `TypedIterator` using the given closure to return a `TypedIterator` of 
+    /// the mapped values.
+    fn map<B, F: FnMut(Self::Item) -> B>(self, f: F) -> Map<Self::Context, Self, F> {
+        Map::new(self, f)
     }
 
     /// Consume the `TypedIterator` and call the closure on each element.

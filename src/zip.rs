@@ -1,6 +1,7 @@
 use super::*;
 use std::marker::PhantomData;
 
+#[derive(Clone)]
 pub struct Zip<A, T, U> {
     t: T,
     u: U,
