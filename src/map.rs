@@ -1,6 +1,5 @@
-use std::marker::PhantomData;
-
 use crate::TypedIterator;
+use std::marker::PhantomData;
 
 #[derive(Clone)]
 pub struct Map<CONTEXT, I, F> {

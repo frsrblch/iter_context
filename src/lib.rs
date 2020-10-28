@@ -1,5 +1,5 @@
 pub use crate::iter::{Iter, IterMut};
-use crate::map::Map;
+pub use crate::map::Map;
 pub use crate::zip::Zip;
 
 mod iter;
@@ -27,7 +27,7 @@ pub trait TypedIterator: IntoIterator + Sized {
         Zip::new(self, rhs)
     }
 
-    /// Map the values from a `TypedIterator` using the given closure to return a `TypedIterator` of 
+    /// Map the values from a `TypedIterator` using the given closure to return a `TypedIterator` of
     /// the mapped values.
     fn map<B, F: FnMut(Self::Item) -> B>(self, f: F) -> Map<Self::Context, Self, F> {
         Map::new(self, f)
