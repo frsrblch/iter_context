@@ -2,13 +2,13 @@ use super::*;
 use std::marker::PhantomData;
 
 #[derive(Clone)]
-pub struct Zip<A, T, U> {
+pub struct Zip<C, T, U> {
     t: T,
     u: U,
-    marker: PhantomData<A>,
+    marker: PhantomData<C>,
 }
 
-impl<A, T, U> Zip<A, T, U> {
+impl<C, T, U> Zip<C, T, U> {
     pub(super) fn new(t: T, u: U) -> Self {
         Self {
             t,
@@ -18,10 +18,10 @@ impl<A, T, U> Zip<A, T, U> {
     }
 }
 
-impl<A, T, U> IntoIterator for Zip<A, T, U>
+impl<C, T, U> IntoIterator for Zip<C, T, U>
 where
-    T: TypedIterator<Context = A>,
-    U: TypedIterator<Context = A>,
+    T: ContextualIterator<Context = C>,
+    U: ContextualIterator<Context = C>,
 {
     type Item = (T::Item, U::Item);
     type IntoIter = std::iter::Zip<T::IntoIter, U::IntoIter>;
@@ -31,8 +31,10 @@ where
     }
 }
 
-impl<A, T: TypedIterator<Context = A>, U: TypedIterator<Context = A>> TypedIterator
-    for Zip<A, T, U>
+impl<C, T, U> ContextualIterator for Zip<C, T, U>
+where
+    T: ContextualIterator<Context = C>,
+    U: ContextualIterator<Context = C>,
 {
-    type Context = A;
+    type Context = C;
 }

@@ -1,5 +1,5 @@
 [package]
-name = "typed_iter"
+name = "iter_context"
 version = "0.1.0"
 authors = ["Fraser Balch <farseer.ulwithy@gmail.com>"]
 edition = "2018"

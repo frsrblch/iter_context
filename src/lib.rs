@@ -9,32 +9,41 @@ mod zip;
 /// An iterator for use with a Struct-of-Arrays data layout, where data is associated by index
 /// within the arrays of the struct.
 ///
-/// Types implementing `TypedIterator` with the same `Context` should all be of the same length and
-/// aligned by index, like columns in a table. Types implementing `TypedIterator` should not implement
+/// Types implementing `ContextualIterator` with the same `Context` should all be of the same length and
+/// aligned by index, like columns in a table. Types implementing `ContextualIterator` should not implement
 /// `Iterator` because many of the `Iterator` functions can cause data misalignment.
 ///
-/// Use `IntoIterator::into_iter()` method or `TypedIterator`'s [`for_each`] method after all
+/// Use `IntoIterator::into_iter()` method or `ContextualIterator`'s [`for_each`] method after all
 /// desired data has been zipped together.
 ///
-/// [`for_each`]: trait.TypedIterator.html#method.for_each
-pub trait TypedIterator: IntoIterator + Sized {
-    /// A `TypedIterator` can only be zipped to another `TypedIterator` with the same `Context`.
+/// [`for_each`]: trait.ContextualIterator.html#method.for_each
+pub trait ContextualIterator: IntoIterator + Sized {
+    /// A `ContextualIterator` can only be zipped to another `ContextualIterator` with the same `Context`.
     type Context;
 
-    /// Zip together two `TypedIterator` with the same Context to return a single `TypedIterator`
+    /// Zip together two `ContextualIterator` with the same Context to return a single `ContextualIterator`
     /// with that same Context.
-    fn zip<U: TypedIterator<Context = Self::Context>>(self, rhs: U) -> Zip<Self::Context, Self, U> {
+    fn zip<U>(self, rhs: U) -> Zip<Self::Context, Self, U>
+    where
+        U: ContextualIterator<Context = Self::Context>,
+    {
         Zip::new(self, rhs)
     }
 
-    /// Map the values from a `TypedIterator` using the given closure to return a `TypedIterator` of
+    /// Map the values from a `ContextualIterator` using the given closure to return a `ContextualIterator` of
     /// the mapped values.
-    fn map<B, F: FnMut(Self::Item) -> B>(self, f: F) -> Map<Self::Context, Self, F> {
+    fn map<B, F>(self, f: F) -> Map<Self::Context, Self, F>
+    where
+        F: FnMut(Self::Item) -> B,
+    {
         Map::new(self, f)
     }
 
-    /// Consume the `TypedIterator` and call the closure on each element.
-    fn for_each<F: FnMut(Self::Item)>(self, f: F) {
+    /// Consume the `ContextualIterator` and call the closure on each element.
+    fn for_each<F>(self, f: F)
+    where
+        F: FnMut(Self::Item),
+    {
         self.into_iter().for_each(f);
     }
 }

@@ -1,14 +1,14 @@
-use crate::TypedIterator;
+use crate::ContextualIterator;
 use std::marker::PhantomData;
 
 #[derive(Clone)]
-pub struct Map<CONTEXT, I, F> {
+pub struct Map<C, I, F> {
     iter: I,
     f: F,
-    marker: PhantomData<CONTEXT>,
+    marker: PhantomData<C>,
 }
 
-impl<CONTEXT, I, F> Map<CONTEXT, I, F> {
+impl<C, I, F> Map<C, I, F> {
     pub(super) fn new(iter: I, f: F) -> Self {
         Map {
             iter,
@@ -18,12 +18,12 @@ impl<CONTEXT, I, F> Map<CONTEXT, I, F> {
     }
 }
 
-impl<CONTEXT, I: IntoIterator, F, B> IntoIterator for Map<CONTEXT, I, F>
+impl<C, I, F, U> IntoIterator for Map<C, I, F>
 where
-    F: FnMut(<I as IntoIterator>::Item) -> B,
+    I: IntoIterator,
+    F: FnMut(<I as IntoIterator>::Item) -> U,
 {
-    type Item = B;
-
+    type Item = U;
     type IntoIter = std::iter::Map<I::IntoIter, F>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -31,11 +31,11 @@ where
     }
 }
 
-impl<CONTEXT, I, F> TypedIterator for Map<CONTEXT, I, F>
+impl<C, I, F> ContextualIterator for Map<C, I, F>
 where
     Self: IntoIterator,
 {
-    type Context = CONTEXT;
+    type Context = C;
 }
 
 #[cfg(test)]

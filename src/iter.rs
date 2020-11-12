@@ -24,7 +24,7 @@ impl<'a, C, T> IntoIterator for Iter<'a, C, T> {
     }
 }
 
-impl<C, T> TypedIterator for Iter<'_, C, T> {
+impl<C, T> ContextualIterator for Iter<'_, C, T> {
     type Context = C;
 }
 
@@ -51,6 +51,6 @@ impl<'a, C, T> IntoIterator for IterMut<'a, C, T> {
     }
 }
 
-impl<C, T> TypedIterator for IterMut<'_, C, T> {
+impl<C, T> ContextualIterator for IterMut<'_, C, T> {
     type Context = C;
 }
