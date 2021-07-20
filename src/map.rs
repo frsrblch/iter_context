@@ -1,41 +1,94 @@
-use crate::ContextualIterator;
+use crate::{ContextualIterator, Zip};
 use std::marker::PhantomData;
 
 #[derive(Clone)]
-pub struct Map<C, I, F> {
-    iter: I,
+pub struct Map<Context, IntoIter, F> {
+    into_iter: IntoIter,
     f: F,
-    marker: PhantomData<C>,
+    context: PhantomData<Context>,
 }
 
-impl<C, I, F> Map<C, I, F> {
-    pub(super) fn new(iter: I, f: F) -> Self {
+impl<Context, IntoIter, F> Map<Context, IntoIter, F> {
+    pub(super) fn new(iter: IntoIter, f: F) -> Self {
         Map {
-            iter,
+            into_iter: iter,
             f,
-            marker: PhantomData,
+            context: PhantomData,
         }
     }
 }
 
-impl<C, I, F, U> IntoIterator for Map<C, I, F>
+impl<Context, IntoIter, F, IterItem, Output> IntoIterator for Map<Context, IntoIter, F>
 where
-    I: IntoIterator,
-    F: FnMut(<I as IntoIterator>::Item) -> U,
+    IntoIter: IntoIterator<Item = IterItem>,
+    F: FnMut(IterItem) -> Output,
 {
-    type Item = U;
-    type IntoIter = std::iter::Map<I::IntoIter, F>;
+    type Item = Output;
+    type IntoIter = std::iter::Map<IntoIter::IntoIter, F>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.iter.into_iter().map(self.f)
+        self.into_iter.into_iter().map(self.f)
     }
 }
 
-impl<C, I, F> ContextualIterator for Map<C, I, F>
+impl<Context, IntoIter, F> ContextualIterator for Map<Context, IntoIter, F>
 where
     Self: IntoIterator,
 {
-    type Context = C;
+    type Context = Context;
+}
+
+macro_rules! impl_op {
+    ($op_trait:ident, $op_fn:ident) => {
+        impl<Context, IntoIter, F, Item, Output, Rhs, RhsItem> std::ops::$op_trait<Rhs>
+            for Map<Context, IntoIter, F>
+        where
+            Self: IntoIterator<Item = Item>,
+            Rhs: ContextualIterator<Context = Context, Item = RhsItem>,
+            Item: std::ops::$op_trait<RhsItem, Output = Output>,
+        {
+            type Output = Map<Context, Zip<Context, Self, Rhs>, fn((Item, RhsItem)) -> Output>;
+
+            fn $op_fn(self, rhs: Rhs) -> Self::Output {
+                self.zip(rhs).map(|(lhs, rhs)| lhs.$op_fn(rhs))
+            }
+        }
+    };
+}
+
+impl_op!(Add, add);
+impl_op!(Sub, sub);
+impl_op!(Mul, mul);
+impl_op!(Div, div);
+impl_op!(Rem, rem);
+impl_op!(Shl, shl);
+impl_op!(Shr, shr);
+impl_op!(BitAnd, bitand);
+impl_op!(BitOr, bitor);
+impl_op!(BitXor, bitxor);
+
+impl<Context, IntoIter, F, Item, Output> std::ops::Neg for Map<Context, IntoIter, F>
+where
+    Self: IntoIterator<Item = Item>,
+    Item: std::ops::Neg<Output = Output>,
+{
+    type Output = Map<Context, Self, fn(Item) -> Output>;
+
+    fn neg(self) -> Self::Output {
+        self.map(std::ops::Neg::neg)
+    }
+}
+
+impl<Context, IntoIter, F, Item, Output> std::ops::Not for Map<Context, IntoIter, F>
+where
+    Self: IntoIterator<Item = Item>,
+    Item: std::ops::Not<Output = Output>,
+{
+    type Output = Map<Context, Self, fn(Item) -> Output>;
+
+    fn not(self) -> Self::Output {
+        self.map(std::ops::Not::not)
+    }
 }
 
 #[cfg(test)]
