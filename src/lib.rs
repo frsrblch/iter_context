@@ -47,6 +47,8 @@ pub trait ContextualIterator: IntoIterator + Sized {
         self.into_iter().for_each(f);
     }
 
+    /// Transform the contextual iterator into a collection.
+    #[must_use]
     fn collect<B>(self) -> B
     where
         B: FromContextualIterator<Self::Item, Context = Self::Context>,
@@ -55,6 +57,9 @@ pub trait ContextualIterator: IntoIterator + Sized {
     }
 }
 
+/// Conversion from a `ContextualIterator`.
+///
+/// Analogous to `std::iter::FromIterator`.
 pub trait FromContextualIterator<Item> {
     type Context;
     fn from_iter<Iter>(iter: Iter) -> Self
