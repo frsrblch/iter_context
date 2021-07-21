@@ -46,6 +46,20 @@ pub trait ContextualIterator: IntoIterator + Sized {
     {
         self.into_iter().for_each(f);
     }
+
+    fn collect<B>(self) -> B
+    where
+        B: FromContextualIterator<Self::Item, Context = Self::Context>,
+    {
+        FromContextualIterator::from_iter(self)
+    }
+}
+
+pub trait FromContextualIterator<Item> {
+    type Context;
+    fn from_iter<Iter>(iter: Iter) -> Self
+    where
+        Iter: ContextualIterator<Context = Self::Context, Item = Item>;
 }
 
 #[cfg(test)]
