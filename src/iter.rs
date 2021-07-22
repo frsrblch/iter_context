@@ -7,9 +7,12 @@ pub struct Iter<'a, C, T> {
 }
 
 impl<'a, C, T> Iter<'a, C, T> {
-    pub fn new(iter: std::slice::Iter<'a, T>) -> Self {
+    pub fn new<IntoIter>(into_iter: IntoIter) -> Self
+    where
+        IntoIter: IntoIterator<IntoIter = std::slice::Iter<'a, T>>,
+    {
         Self {
-            iter,
+            iter: into_iter.into_iter(),
             marker: PhantomData,
         }
     }
@@ -34,9 +37,12 @@ pub struct IterMut<'a, C, T> {
 }
 
 impl<'a, C, T> IterMut<'a, C, T> {
-    pub fn new(iter_mut: std::slice::IterMut<'a, T>) -> Self {
+    pub fn new<IntoIter>(into_iter: IntoIter) -> Self
+    where
+        IntoIter: IntoIterator<IntoIter = std::slice::IterMut<'a, T>>,
+    {
         Self {
-            iter_mut,
+            iter_mut: into_iter.into_iter(),
             marker: PhantomData,
         }
     }
