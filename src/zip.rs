@@ -1,6 +1,8 @@
 use super::*;
 use std::marker::PhantomData;
 
+/// A [ContextualIterator] that combines two [ContextualIterator] and returns an
+/// tuples of their values.
 #[derive(Clone)]
 pub struct Zip<C, T, U> {
     t: T,

@@ -1,6 +1,8 @@
 use crate::{ContextualIterator, Zip};
 use std::marker::PhantomData;
 
+/// Maps the values from a [ContextualIterator] with the given closure, which is itself
+/// a [ContextualIterator] with the same Context as the original iterator.
 #[derive(Clone)]
 pub struct Map<Context, IntoIter, F> {
     into_iter: IntoIter,
